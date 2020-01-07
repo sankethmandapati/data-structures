@@ -42,6 +42,73 @@ class Linkedlist {
         }
         return;
     }
+    includes(e) {
+        for(let l of this) {
+            if(l === e) {
+                return true;
+            }
+        }
+        return false;
+    }
+    map(fn) {
+        const newLinkedlist = new Linkedlist();
+        for(let l of this) {
+            const mod = fn(l);
+            newLinkedlist.push(mod);
+        }
+        return newLinkedlist;
+    }
+    filter(fn) {
+        const newLinkedlist = new Linkedlist();
+        for(let l of this) {
+            const found = fn(l);
+            if(found) {
+                newLinkedlist.push(l);
+            }
+        }
+        return newLinkedlist;
+    }
+    reduce(fn, initialValue) {
+        if(typeof fn != "function") {
+            throw new TypeError(`${typeof fn} is not a function`);
+        }
+        if(this.length === 0 && !initialValue) {
+            throw new TypeError("Reduce of empty array with no initial value");
+        }
+        let resultValue = (initialValue === undefined) ? this.head.value : initialValue;
+        let n = 0;
+        for(let l of this) {
+            resultValue = fn(resultValue, l, n);
+            n++;
+        }
+        return resultValue;
+    }
+    remove(match, removeAllMatches) {
+        let l = this.head;
+        let previous = null;
+        while(l) {
+            const found = false;
+            if(typeof match === "function") {
+                found = match(l);
+            } else {
+                found = (l === match);
+            }
+            if(found) {
+                if(previous) {
+                    previous.next = l.next;
+                } else {
+                    this.head = l.next;
+                }
+                delete l;
+                if(!removeAllMatches) {
+                    return true;
+                }
+            }
+            previous = l;
+            l = l.next;
+        }
+        return true;
+    }
     push(e) {
         const node = new Node(e);
         let lastNode = this.getNthLastNode();
@@ -68,11 +135,15 @@ class Linkedlist {
             newList.push(l);
         }
         if(list instanceof Node) {
-            newList.push(list.value)
-            while(list.next) {
-                list = list.next;
+            // newList.push(list.value)
+            while(list) {
                 newList.push(list.value);
+                list = list.next;
             }
+        } else if(list instanceof Linkedlist) {
+            for(let l of list) {
+                newList.push(l);
+            }   
         }
         return newList;
     }
@@ -82,17 +153,30 @@ class Linkedlist {
         for(let current of this) {
             if((n >= begin) && (n < end)) {
                 newLinkedList.push(current);
+                if(n === (end - 1)) {
+                    break;
+                }
             }
             n++;
         }
         return newLinkedList;
     }
-    sort() {
+    sort(fn) {
         const merge = (left, right) => {
             const resultList = new Linkedlist();
             let leftPointer = left.head, rightPointer = right.head;
             while(leftPointer && rightPointer) {
-                if(leftPointer.value < rightPointer.value) {
+                let comparision = 0;
+                if(fn) {
+                    if(typeof fn == "function") {
+                        comparision = fn(leftPointer.value, rightPointer.value);
+                    } else {
+                        throw new Error(`Expected a function but got ${typeof fn}`);
+                    }
+                } else {
+                    comparision = `${leftPointer.value}`.localeCompare(`${rightPointer.value}`);
+                }
+                if(comparision < 0) {
                     resultList.push(leftPointer.value);
                     leftPointer = leftPointer.next || undefined;
                 } else {
