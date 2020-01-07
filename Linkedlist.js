@@ -247,6 +247,28 @@ class Linkedlist {
             this.push(e);
         });
     }
+    insertElement(element, index) {
+        let n = 0;
+        let current = this.head;
+        let previous = null;
+        const newNode = new Node(element);
+        while(current) {
+            if(n === index) {
+                if(previous) {
+                    newNode.next = current;
+                    previous.next = newNode;
+                } else {
+                    newNode.next = this.head;
+                    this.head = newNode;
+                }
+                this.length++;
+                return true;
+            }
+            previous = current;
+            current = current.next;
+            n++;
+        }
+    }
 
     [Symbol.iterator]() {
         let current = this.head;
