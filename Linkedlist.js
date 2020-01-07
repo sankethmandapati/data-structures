@@ -52,19 +52,23 @@ class Linkedlist {
     }
     map(fn) {
         const newLinkedlist = new Linkedlist();
+        let n = 0;
         for(let l of this) {
-            const mod = fn(l);
+            const mod = fn(l, n, this);
             newLinkedlist.push(mod);
+            n++;
         }
         return newLinkedlist;
     }
     filter(fn) {
         const newLinkedlist = new Linkedlist();
+        let n = 0;
         for(let l of this) {
-            const found = fn(l);
+            const found = fn(l, n);
             if(found) {
                 newLinkedlist.push(l);
             }
+            n++;
         }
         return newLinkedlist;
     }
@@ -78,7 +82,7 @@ class Linkedlist {
         let resultValue = (initialValue === undefined) ? this.head.value : initialValue;
         let n = 0;
         for(let l of this) {
-            resultValue = fn(resultValue, l, n);
+            resultValue = fn(resultValue, l, n, this);
             n++;
         }
         return resultValue;
@@ -86,10 +90,11 @@ class Linkedlist {
     remove(match, removeAllMatches) {
         let l = this.head;
         let previous = null;
+        let n = 0;
         while(l) {
-            const found = false;
+            let found = false;
             if(typeof match === "function") {
-                found = match(l);
+                found = match(l, n);
             } else {
                 found = (l === match);
             }
@@ -99,13 +104,13 @@ class Linkedlist {
                 } else {
                     this.head = l.next;
                 }
-                delete l;
                 if(!removeAllMatches) {
                     return true;
                 }
             }
             previous = l;
             l = l.next;
+            n++;
         }
         return true;
     }
@@ -121,10 +126,17 @@ class Linkedlist {
     }
     pop() {
         let node = this.getNthLastNode(2);
+        let element = null;
+        if(this.length === 1) {
+            element = this.head.value;
+            this.head = null;
+            this.length--;
+            return element;
+        }
         if(!node) {
             return null;
         }
-        const element = node.next.value;
+        element = node.next.value;
         delete node.next;
         this.length--;
         return element;
@@ -200,6 +212,40 @@ class Linkedlist {
         }
         const sorted = mergeSort(this);
         return sorted;
+    }
+    findAndModify(fn) {
+        let n = 0;
+        let node = this.head;
+        while(node) {
+            const mod = fn(node.value, n, this);
+            node.value = mod;
+            node = node.next;
+            n++;
+        }
+        return newLinkedlist;
+    }
+    modifyByIndex(index, update) {
+        if((index < 0) || (index >= this.length)) {
+            throw new ReferenceError("Index you have mentioned doesnt exist");
+        }
+        let n = 0;
+        let node = this.head;
+        while(node) {
+            if(n == index) {
+                node.value = update;
+                return true;
+            }
+            node = node.next;
+            n++;
+        }
+    }
+    insertArray(array) {
+        if(!Array.isArray(array)) {
+            throw new TypeError(`Expected Array, got ${typeof array}`);
+        }
+        array.forEach((e) => {
+            this.push(e);
+        });
     }
 
     [Symbol.iterator]() {
