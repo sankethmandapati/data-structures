@@ -6,7 +6,7 @@ function DoubleLinkedList() {
     this.length = 0;
 }
 
-DoubleLinkedList.prototype.push = function(n) {
+DoubleLinkedList.prototype.queue = function(n) {
     let node = new Node(n);
     if(this.length === 0) {
         this.head = node;
@@ -15,6 +15,16 @@ DoubleLinkedList.prototype.push = function(n) {
         node.previous = this.tail;
     }
     this.tail = node;
+    this.length++;
+    return n;
+}
+DoubleLinkedList.prototype.stack = function(n) {
+    let node = new Node(n);
+    if(this.length != 0) {
+        node.next = this.head;
+        this.head.previous = node;
+    }
+    this.head = node;
     this.length++;
     return n;
 }
@@ -75,6 +85,39 @@ DoubleLinkedList.prototype.removeAtIndex = function(index) {
     }
     delete node;
     return true;
+}
+DoubleLinkedList.prototype.insertElement = function(n, index) {
+    const nodeAtIndex = this.returnNodeAtIndex(index);
+    if(nodeAtIndex === -1) {
+        throw new ReferenceError('no element found at specified index');
+    }
+    const node = new Node(n);
+    const previous = nodeAtIndex.previous;
+
+    node.next = nodeAtIndex;
+    node.previous = previous;
+    previous.next = node;
+}
+DoubleLinkedList.prototype.slice = function(begin = 0, end = this.length) {
+    let n = 0;
+    const newLinkedList = new DoubleLinkedList();
+    for(let current of this) {
+        if((n >= begin) && (n < end)) {
+            newLinkedList.queue(current);
+            if(n === (end - 1)) {
+                break;
+            }
+        }
+        n++;
+    }
+    return newLinkedList;
+}
+DoubleLinkedList.prototype.reverseIterate = function * () {
+    let current = this.tail;
+    while(current) {
+        yield current.value;
+        current = current.previous;
+    }
 }
 DoubleLinkedList.prototype[Symbol.iterator] = function() {
     let current = this.head;
