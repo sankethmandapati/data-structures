@@ -198,6 +198,36 @@ DoubleLinkedList.prototype.sort = function(fn) {
     const sorted = mergeSort(this);
     return sorted;
 }
+DoubleLinkedList.prototype.insertArray = function(array) {
+    if(!Array.isArray(array)) {
+        throw new TypeError(`Expected Array, got ${typeof array}`);
+    }
+    array.forEach((e) => {
+        this.queue(e);
+    });
+}
+DoubleLinkedList.prototype.forEach = function(fn) {
+    let i = 0;
+    for(let n of this) {
+        fn(n, i);
+        i++;
+    }
+}
+DoubleLinkedList.prototype.map = function(fn) {
+    const newDll = new DoubleLinkedList();
+    let i = 0;
+    for(let n of this) {
+        const res = fn(i, n, this);
+        i++;
+    }
+    return newDll;
+}
+DoubleLinkedList.prototype.reduce = function(fn, initialValue) {}
+DoubleLinkedList.prototype.find = function(fn) {}
+DoubleLinkedList.prototype.findAndModify = function(fn) {}
+DoubleLinkedList.prototype.filter = function(fn) {}
+DoubleLinkedList.prototype.join = function(fn) {}
+DoubleLinkedList.prototype.reverse = function(fn) {}
 DoubleLinkedList.prototype[Symbol.iterator] = function() {
     let current = this.head;
     return {
