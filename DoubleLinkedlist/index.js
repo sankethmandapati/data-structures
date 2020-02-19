@@ -288,14 +288,12 @@ DoubleLinkedList.prototype[Symbol.iterator] = function() {
     let current = this.head;
     return {
         next: () => {
-            if(!current) {
-                return {done: true};
-            }
+            const val = current.value;
             const returnVal = {
-                value: current.value,
-                done: false
+                value: val,
+                done: (val === undefined)
             };
-            current = current.next;
+            current = current.next || {};
             return returnVal;
         }
     };
