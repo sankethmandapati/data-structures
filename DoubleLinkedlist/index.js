@@ -222,12 +222,68 @@ DoubleLinkedList.prototype.map = function(fn) {
     }
     return newDll;
 }
-DoubleLinkedList.prototype.reduce = function(fn, initialValue) {}
-DoubleLinkedList.prototype.find = function(fn) {}
-DoubleLinkedList.prototype.findAndModify = function(fn) {}
-DoubleLinkedList.prototype.filter = function(fn) {}
-DoubleLinkedList.prototype.join = function(fn) {}
-DoubleLinkedList.prototype.reverse = function(fn) {}
+DoubleLinkedList.prototype.reduce = function(fn, initialValue) {
+    if(typeof fn != "function") {
+        throw new TypeError(`${typeof fn} is not a function`);
+    }
+    if(this.length === 0 && !initialValue) {
+        throw new TypeError("Reduce of empty array with no initial value");
+    }
+    let resultValue = (initialValue === undefined) ? this.head.value : initialValue;
+    let n = 0;
+    for(let l of this) {
+        resultValue = fn(resultValue, l, n, this);
+        n++;
+    }
+    return resultValue;
+}
+DoubleLinkedList.prototype.find = function(fn) {
+    const foundNode = this.findNode(fn);
+    if(foundNode) {
+        return foundNode.value;
+    }
+    return null;
+}
+DoubleLinkedList.prototype.findAndModify = function(fn) {
+    let n = 0;
+    let node = this.head;
+    while(node) {
+        const mod = fn(node.value, n, this);
+        node.value = mod;
+        node = node.next;
+        n++;
+    }
+    return newLinkedlist;
+}
+DoubleLinkedList.prototype.filter = function(fn) {
+    const newLinkedlist = new DoubleLinkedList();
+    let n = 0;
+    for(let l of this) {
+        const found = fn(l, n);
+        if(found) {
+            newLinkedlist.push(l);
+        }
+        n++;
+    }
+    return newLinkedlist;
+}
+DoubleLinkedList.prototype.join = function(fn, delimiter = ',') {
+    let result = '';
+    let n = 0;
+    const lastIndex = this.length - 1;
+    for(let l in this) {
+        result += l + ((n === lastIndex) ? '' : delimieter);
+        n++;
+    }
+    return result;
+}
+DoubleLinkedList.prototype.reverse = function() {
+    const newDll = new DoubleLinkedList();
+    for(let l of this) {
+        newDll.stack(l);
+    }
+    return newDll;
+}
 DoubleLinkedList.prototype[Symbol.iterator] = function() {
     let current = this.head;
     return {
