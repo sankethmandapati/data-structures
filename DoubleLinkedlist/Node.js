@@ -7,5 +7,21 @@ function Node(value) {
         this.previous = null;
     }
 };
+Node.prototype.append = function(node) {
+    if(!(node instanceof Node)) {
+        node = new Node(node);
+    }
+    this.next = node;
+    node.previous = this;
+    return node;
+}
+Node.prototype.prepend = function(node) {
+    if(!(node instanceof Node)) {
+        node = new Node(node);
+    }
+    this.previous = node;
+    node.next = this;
+    return node;
+}
 
 module.exports = Node;
