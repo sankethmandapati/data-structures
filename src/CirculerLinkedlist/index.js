@@ -138,3 +138,5 @@ CircularLinkedlist.prototype[Symbol.iterator] = function() {
         }
     };
 }
+
+module.exports = CircularLinkedlist;

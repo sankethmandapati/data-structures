@@ -1,0 +1,26 @@
+{
+  "name": "data-structures",
+  "version": "1.0.0",
+  "description": "a node module to implement some data-structures in javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sankethmandapati/data-structures.git"
+  },
+  "keywords": [
+    "datastructures",
+    "javascript"
+  ],
+  "author": "Sanketh Mandapati",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sankethmandapati/data-structures/issues"
+  },
+  "homepage": "https://github.com/sankethmandapati/data-structures#readme",
+  "dependencies": {
+    "@babel/runtime": "^7.8.4"
+  }
+}

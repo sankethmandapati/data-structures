@@ -208,7 +208,8 @@ DoubleLinkedList.prototype.map = function(fn) {
     const newDll = new DoubleLinkedList();
     let i = 0;
     for(let n of this) {
-        const res = fn(i, n, this);
+        const res = fn(n, i, this);
+        newDll.push(res);
         i++;
     }
     return newDll;
