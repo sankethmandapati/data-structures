@@ -396,7 +396,6 @@ DoubleLinkedList.prototype.splice = function() {
     }
     if((start >= this.length) || (nodesToRemove <= 0)) {
         this.insertArray(rest);
-        return null;
     } else if(start === 0) {
         if(nodesToRemove >= this.length) {
             this.head = null;
@@ -426,6 +425,7 @@ DoubleLinkedList.prototype.splice = function() {
         ).append(endingNode);
         this.length = this.length - nodesToRemove + rest.length;
     }
+    return null;
 }
 DoubleLinkedList.prototype.toString = function() {
     return this.join();
