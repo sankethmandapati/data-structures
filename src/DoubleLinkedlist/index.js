@@ -20,21 +20,19 @@ DoubleLinkedList.prototype.unshift = function() {
     return this.length;
 }
 DoubleLinkedList.prototype.pop = function() {
-    const tailNodeValue = this.tail.value;
-    const previousNode = this.tail.previous;
-    if(this.length === 1) {
-        delete this.head;
-        delete this.tail;
-        this.head = null;
-        this.tail = null;
-    } else {
-        delete previousNode.next;
-        previousNode.next = null;
-        this.tail = previousNode;
+    if(this.length > 0) {
+        const tailNodeValue = this.tail.value;
+        const previousNode = this.tail.previous;
+        if(this.length === 1) {
+            this.head = null;
+            this.tail = null;
+        } else {
+            this.tail = previousNode.removeNext();
+        }
+        return tailNodeValue;
     }
-    return tailNodeValue;
 }
-DoubleLinkedList.prototype.getNodeAtIndex = function(index) {
+DoubleLinkedList.prototype.findNodeByIndex = function(index) {
     index = (index < 0) ? (this.length + index) : index;
     if(index >= 0 && index < this.length) {
         const forwardIterate = index < (this.length - index);
@@ -51,15 +49,32 @@ DoubleLinkedList.prototype.getNodeAtIndex = function(index) {
     }
     return -1;
 }
-DoubleLinkedList.prototype.getElementAtIndex = function(index) {
-    const node = this.getNodeAtIndex(index);
+DoubleLinkedList.prototype.slice = function(begin = 0, end = this.length) {
+    const forwardIterate = begin < (this.length - end - 1);
+    let n = forwardIterate ? 0 : (this.length - 1);
+    const iterator = forwardIterate ? this : this.reverseIterate();
+    const method = forwardIterate ? 'push' : 'unshift';
+    const newLinkedList = new DoubleLinkedList();
+    for(let current of iterator) {
+        if((n >= begin) && (n < end)) {
+            newLinkedList[method](current);
+            if(n === (end - 1)) {
+                break;
+            }
+        }
+        forwardIterate ? n++ : n--;
+    }
+    return newLinkedList;
+}
+DoubleLinkedList.prototype.findByIndex = function(index) {
+    const node = this.findNodeByIndex(index);
     if(node === -1) {
         return undefined;
     }
     return node.value;
 }
 DoubleLinkedList.prototype.updateAtIndex = function(index, newValue) {
-    const node = this.getNodeAtIndex(index);
+    const node = this.findNodeByIndex(index);
     if(node === -1) {
         return -1;
     } else {
@@ -68,7 +83,7 @@ DoubleLinkedList.prototype.updateAtIndex = function(index, newValue) {
     }
 }
 DoubleLinkedList.prototype.removeAtIndex = function(index) {
-    const node = this.getNodeAtIndex(index);
+    const node = this.findNodeByIndex(index);
     if(node === -1) {
         return undefined;
     }
@@ -79,51 +94,22 @@ DoubleLinkedList.prototype.removeAtIndex = function(index) {
     } else if(!next) {
         this.tail = previous
     } else {
-        previous.next = next;
-        next.previous = previous;
+        previous.append(next);
     }
-    delete node;
     return true;
 }
 DoubleLinkedList.prototype.insertElement = function(n, index) {
-    const nodeAtIndex = this.getNodeAtIndex(index);
+    const nodeAtIndex = this.findNodeByIndex(index);
     if(nodeAtIndex === -1) {
         throw new ReferenceError('no element found at specified index');
     }
-    const node = new Node(n);
     const previous = nodeAtIndex.previous;
-
-    node.next = nodeAtIndex;
-    node.previous = previous;
-    previous.next = node;
-}
-DoubleLinkedList.prototype.slice = function(begin = 0, end = this.length) {
-    // const direction = begin < (this.length - end - 1) ? 1 : -1;
-    let n = begin < (this.length - end - 1) ? 0 : (this.length - 1);
-    const newLinkedList = new DoubleLinkedList();
-    if(n === 0) {
-        for(let current of this) {
-            if((n >= begin) && (n < end)) {
-                newLinkedList.push(current);
-                if(n === (end - 1)) {
-                    break;
-                }
-            }
-            n++;
-        }
+    const node = nodeAtIndex.prepend(n);
+    if(previous) {
+        node.prepend(previous);
     } else {
-        const gen = this.reverseIterate();
-        for(let current of gen) {
-            if((n >= begin) && (n < end)) {
-                newLinkedList.unshift(current);
-                if(n === begin) {
-                    break;
-                }
-            }
-            n--;
-        }
+        this.head = node;
     }
-    return newLinkedList;
 }
 DoubleLinkedList.prototype.reverseIterate = function * () {
     let current = this.tail;
@@ -198,19 +184,19 @@ DoubleLinkedList.prototype.insertArray = function(array) {
     });
 }
 DoubleLinkedList.prototype.forEach = function(fn) {
-    let i = 0;
-    for(let n of this) {
-        fn(n, i);
-        i++;
+    let n = 0;
+    for(let l of this) {
+        fn(n, l);
+        n++;
     }
 }
 DoubleLinkedList.prototype.map = function(fn) {
     const newDll = new DoubleLinkedList();
-    let i = 0;
-    for(let n of this) {
-        const res = fn(n, i, this);
+    let n = 0;
+    for(let l of this) {
+        const res = fn(l, n, this);
         newDll.push(res);
-        i++;
+        n++;
     }
     return newDll;
 }
@@ -229,6 +215,19 @@ DoubleLinkedList.prototype.reduce = function(fn, initialValue) {
     }
     return resultValue;
 }
+DoubleLinkedList.prototype.findNode = function(fn) {
+    let n = 0;
+    let node = this.head;
+    while(node) {
+        const found = fn(l, n);
+        if(found) {
+            return node;
+        }
+        node = node.next;
+        n++;
+    }
+    return null;
+}
 DoubleLinkedList.prototype.find = function(fn) {
     const foundNode = this.findNode(fn);
     if(foundNode) {
@@ -245,7 +244,7 @@ DoubleLinkedList.prototype.findAndModify = function(fn) {
         node = node.next;
         n++;
     }
-    return newLinkedlist;
+    return this;
 }
 DoubleLinkedList.prototype.filter = function(fn) {
     const newLinkedlist = new DoubleLinkedList();
@@ -259,12 +258,12 @@ DoubleLinkedList.prototype.filter = function(fn) {
     }
     return newLinkedlist;
 }
-DoubleLinkedList.prototype.join = function(fn, delimiter = ',') {
+DoubleLinkedList.prototype.join = function(delimiter = ',') {
     let result = '';
     let n = 0;
     const lastIndex = this.length - 1;
     for(let l in this) {
-        result += l + ((n === lastIndex) ? '' : delimieter);
+        result += l + ((n === lastIndex) ? '' : delimiter);
         n++;
     }
     return result;
@@ -317,7 +316,7 @@ DoubleLinkedList.prototype.every = function(fn, self) {
     }
     return result;
 }
-DoubleLinkedList.prototype.some = function() {
+DoubleLinkedList.prototype.some = function(fn, self) {
     let result = false;
     let n = 0;
     if(typeof fn !== 'function') {
@@ -404,21 +403,21 @@ DoubleLinkedList.prototype.splice = function() {
             this.length = rest.length;
             this.insertArray(rest);
         } else {
-            endingNode = this.getNodeAtIndex(nodesToRemove);
+            endingNode = this.findNodeByIndex(nodesToRemove);
             delete endingNode.previous;
             endingNode.previous = null;
             this.head = rest.reduceRight((o, n) => o.prepend(n), endingNode);
             this.length = this.length - nodesToRemove + rest.length;
         }
     } else if(nodesToRemove >= (this.length - start)) {
-        beginingNode = this.getNodeAtIndex(start - 1);
+        beginingNode = this.findNodeByIndex(start - 1);
         delete beginingNode.next;
         // beginingNode.next = null;
         this.tail = rest.reduce((o, n) => o.append(n), beginingNode);
         this.length = start + 1 + rest.length;
     } else {
-        beginingNode = this.getNodeAtIndex(start - 1);
-        endingNode = this.getNodeAtIndex(start + nodesToRemove);
+        beginingNode = this.findNodeByIndex(start - 1);
+        endingNode = this.findNodeByIndex(start + nodesToRemove);
         delete beginingNode.next;
         delete endingNode.previous;
         rest.reduce(
@@ -433,6 +432,34 @@ DoubleLinkedList.prototype.toString = function() {
 }
 DoubleLinkedList.prototype.toArray = function() {
     return [...this];
+}
+DoubleLinkedList.prototype.shiftNodeToTop = function(node) {
+    if(!node) {
+        return false;
+    }
+    if(!node.previous) {
+        return true;
+    }
+    if(!node.next) {
+        this.tail = node.previous;
+        node.previous = null
+        this.head = node.append(this.head);
+        return true;
+    }
+    node.previous.append(node.next);
+    node.previous = null;
+    this.head = node.append(this.head);
+    return true;
+}
+DoubleLinkedList.prototype.findAndShiftToTop = function(fn) {
+    const node = this.findNode(fn);
+    const result = this.shiftNodeToTop(node);
+    return result;
+}
+DoubleLinkedList.prototype.findByIndexAndShiftToTop = function(index) {
+    const node = this.findByIndex(index);
+    const result = this.shiftNodeToTop(node);
+    return result;
 }
 
 module.exports = DoubleLinkedList;

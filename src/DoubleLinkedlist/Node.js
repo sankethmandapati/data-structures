@@ -6,7 +6,7 @@ function Node(value) {
         this.next = null;
         this.previous = null;
     }
-};
+}
 Node.prototype.append = function(node) {
     if(!(node instanceof Node)) {
         node = new Node(node);
@@ -22,6 +22,10 @@ Node.prototype.prepend = function(node) {
     this.previous = node;
     node.next = this;
     return node;
+}
+Node.prototype.removeNext = function() {
+    this.next = null;
+    return this;
 }
 
 module.exports = Node;
