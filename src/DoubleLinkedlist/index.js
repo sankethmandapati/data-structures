@@ -139,6 +139,13 @@ DoubleLinkedList.prototype.concat = function(list) {
         for(let l of list) {
             newList.push(l);
         }   
+    } else if(Array.isArray(list)) {
+        const len = list.length;
+        for(let i = 0; i < len; i++) {
+            newList.push(list[i]);
+        }
+    } else {
+        newList.push(list);
     }
     return newList;
 }
