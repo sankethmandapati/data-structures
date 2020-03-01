@@ -5,6 +5,13 @@ function DoubleLinkedList() {
     this.tail = null;
     this.length = 0;
 }
+DoubleLinkedList.spread = function() {
+    const newDLll = new DoubleLinkedList();
+    for(let i = 0; i < arguments.length; i++) {
+        newDLll.concat(arguments[i]);
+    }
+    return newDll;
+}
 DoubleLinkedList.prototype.push = function(n) {
     if(this.length === 0) {
         this.head = this.tail = new Node(n);
