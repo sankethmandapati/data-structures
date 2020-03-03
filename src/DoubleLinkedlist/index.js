@@ -1,6 +1,9 @@
 var Node = require('./Node');
 
+function classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 function DoubleLinkedList() {
+    classCallCheck(this, DoubleLinkedList);
     this.head = null;
     this.tail = null;
     this.length = 0;
